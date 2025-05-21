@@ -1,11 +1,13 @@
 import nodemailer from "nodemailer";
-import { SendOtpEmailOptions } from "@/types/global";
 
-export async function sendOtpEmail({ to, otp }: SendOtpEmailOptions) {
+export async function sendOtpEmail(to: string): Promise<string> {
+  // Generate OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT),
-    secure: Number(process.env.SMTP_PORT) === 465, // true for port 465, false for 587
+    secure: Number(process.env.SMTP_PORT) === 465,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
@@ -20,4 +22,6 @@ export async function sendOtpEmail({ to, otp }: SendOtpEmailOptions) {
   };
 
   await transporter.sendMail(mailOptions);
+
+  return otp;
 }

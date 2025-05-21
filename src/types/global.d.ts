@@ -22,3 +22,9 @@ export interface SignupRequestBody {
   email: string;
   password: string;
 }
+
+
+interface VerifyOtpRequest {
+  email: string;
+  otp: string;
+}
