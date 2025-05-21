@@ -7,13 +7,60 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  password     String
-  otp          String?  // For email verification
-  otpExpiresAt DateTime?
-  Isverified   Boolean  @default(false)
-  createdAt    DateTime @default(now())
+  id              String    @id @default(uuid()) @map("_id")
+  email           String    @unique
+  password        String
+  otp             String? // For email verification
+  otpExpiresAt    DateTime? //for 10mint set
+  isEmailVerified Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Referrals
+  referralCode String  @unique
+  referredById String?
+  referredBy   User?   @relation("Referrer", fields: [referredById], references: [id])
+  referrals    User[]  @relation("Referrer")
+
+  // Relationships
+  miningSessions  MiningSession[]
+  wallet          Wallet?
+  referralBonuses ReferralBonus[]
+}
+
+model MiningSession {
+  id        String    @id @default(uuid()) @map("_id")
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  startedAt DateTime
+  lastTapAt DateTime
+  endedAt   DateTime?
+  duration  Int // in seconds
+  reward    Float // mined amount
+}
+
+model Wallet {
+  id         String     @id @default(uuid()) @map("_id")
+  userId     String     @unique
+  user       User       @relation(fields: [userId], references: [id])
+  totalMined Float      @default(0)
+  dispatches Dispatch[]
+}
+
+model Dispatch {
+  id           String   @id @default(uuid()) @map("_id")
+  walletId     String
+  wallet       Wallet   @relation(fields: [walletId], references: [id])
+  amount       Float
+  dispatchedAt DateTime @default(now())
+}
+
+model ReferralBonus {
+  id        String   @id @default(uuid()) @map("_id")
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  bonusType String // e.g., "rate", "duration"
+  amount    Float
+  createdAt DateTime @default(now())
 }
