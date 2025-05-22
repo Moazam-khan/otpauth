@@ -18,7 +18,7 @@ model User {
   updatedAt       DateTime  @updatedAt
 
   // Referrals
-  referralCode String  @unique
+  referralCode String  @unique  // Each user has a unique referral code to invite others
   referredById String?
   referredBy   User?   @relation("Referrer", fields: [referredById], references: [id])
   referrals    User[]  @relation("Referrer")
@@ -60,7 +60,7 @@ model ReferralBonus {
   id        String   @id @default(uuid()) @map("_id")
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  bonusType String // e.g., "rate", "duration"
+  bonusType String // e.g., "rate", "duration" "inivite users"
   amount    Float
   createdAt DateTime @default(now())
 }
